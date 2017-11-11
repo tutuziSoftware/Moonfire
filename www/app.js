@@ -5,7 +5,7 @@ ark.controller("saveController", ['$scope', '$http', '$timeout', function($scope
   fetchGists();
 
   //---private-----------------------------------------------------------------------------------------------
-  var api = new GistAPI($http);
+  var api = new GistAPI();
   var selectedGist = {
     gistId:null,
     file:null
@@ -100,6 +100,7 @@ ark.controller("saveController", ['$scope', '$http', '$timeout', function($scope
         content:$scope.editor
       };
 
+      //TODO gistapiに移動する
       $http({
         url:"https://api.github.com/gists/"+selectedGist.gistId,
         method:"PATCH",
@@ -263,14 +264,13 @@ ark.controller("saveController", ['$scope', '$http', '$timeout', function($scope
 
 
 
-function GistAPI($http){
-  this._$http = $http;
+function GistAPI(){
   var self = this;
 
   new Storage("accessToken").getItem().then(function(accessToken){
     self._accessToken = accessToken;
   }).catch(function(){
-    self._initOauth($http);
+    self._initOauth();
   });
 }
 GistAPI.prototype.createGist = function(gistName, text){
@@ -283,7 +283,7 @@ GistAPI.prototype.createGist = function(gistName, text){
 
       console.log(files);
 
-      this._$http({
+      new Http({
         url:"https://api.github.com/gists",
         method:"POST",
         data:{
@@ -292,9 +292,9 @@ GistAPI.prototype.createGist = function(gistName, text){
         headers: {
           Authorization: "token "+accessToken
         }
-      }).success(function(gist){
+      }).ajax().then(function(gist){
         resolve(gist);
-      }).error(function(){
+      }).catch(function(){
         reject();
       });
     }.bind(this));
@@ -309,7 +309,6 @@ GistAPI.prototype.createGist = function(gistName, text){
  */
 GistAPI.prototype.saveRenameFile = function(gistId, file, newName){
   const OLD_NAME = file.filename;
-  var $http = this._$http;
   var promise = new Promise(function(resolve, reject){
     new Storage("accessToken").getItem().then(function(accessToken){
       new Storage(gistId+OLD_NAME).getItem().then(function(content){
@@ -324,7 +323,7 @@ GistAPI.prototype.saveRenameFile = function(gistId, file, newName){
         console.log(files);
         console.log(accessToken);
 
-        $http({
+        new Http({
           url:"https://api.github.com/gists/"+gistId,
           method:"PATCH",
           data:{
@@ -333,14 +332,14 @@ GistAPI.prototype.saveRenameFile = function(gistId, file, newName){
           headers: {
             Authorization: "token "+accessToken
           }
-        }).success(function(){
+        }).ajax().then(function(){
           console.log("success");
           new Storage(gistId+OLD_NAME).removeItem().then(function(){
             new Storage(gistId+newName).setItem(content).then(function(){
               resolve();
             });
           });
-        }).error(function(){
+        }).catch(function(){
           console.log(arguments, this);
           reject();
         });
@@ -358,7 +357,6 @@ GistAPI.prototype.saveRenameFile = function(gistId, file, newName){
  */
 GistAPI.prototype.getFile = function(gist, file){
   const self = this;
-  const $http = this._$http;
 
   const promise = new Promise(function(resolve, reject){
     const storage = new Storage(gist.id+file.filename);
@@ -372,9 +370,9 @@ GistAPI.prototype.getFile = function(gist, file){
     });
 
     function fetch(localText){
-      $http({
+      new Http({
         url:"https://api.github.com/gists/"+gist.id
-      }).success(function(gist){
+      }).ajax().then(function(gist){
         const LOCAL_FILE_EXIST = 1;
         const SERVER_FILE_EXIST = 2;
         const FILE_EXIST = 3;
@@ -440,7 +438,7 @@ GistAPI.prototype.getFile = function(gist, file){
         }else{
           reject("?_ERROR");
         }
-      }).error(function(){
+      }).catch(function(){
         if(localText !== void 0){
           resolve({
             localText:localText,
@@ -493,26 +491,24 @@ GistAPI.prototype.reload = function(){
  * @private
  */
 GistAPI.prototype._fetchRawUrl = function(file){
-  const $http = this._$http;
-
   return new Promise(function(resolve, reject){
-    $http({
+    new Http({
       url:file.raw_url
-    }).success(function(text){
+    }).ajax().then(function(text){
       resolve(text);
-    }).error(function(){
+    }).catch(function(){
       reject("NETWORK_ERROR");
     });
   });
 };
-GistAPI.prototype._initOauth = function($http){
+GistAPI.prototype._initOauth = function(){
   const APP_ID = "b3acd7e486cdddfc9a7d";
 
   window.open("https://github.com/login/oauth/authorize?client_id="+APP_ID+"&scope=gist", "_blank");
 
   var code = prompt('codeを入力してください');
 
-  $http({
+  new Http({
     url:"https://github.com/login/oauth/access_token",
     method:"POST",
     data:{
@@ -520,8 +516,8 @@ GistAPI.prototype._initOauth = function($http){
       client_secret:"c59721ff0a3e25b174570e43da4070cca81fabb9",
       code:code
     }
-  })
-  .success(function(param){
+  }).ajax()
+  .then(function(param){
     console.log(param);
     var accessToken = param.match(/access_token=([^&]*)/)[1];
 
@@ -532,25 +528,24 @@ GistAPI.prototype._initOauth = function($http){
       });
     }
   })
-  .error(function(data, status){
+  .catch(function(data, status){
     console.log(data, status);
   });
 };
 GistAPI.prototype._initUserData = function(){
   var self = this;
-  var $http = this._$http;
 
   new Storage("accessToken").getItem().then(function(accessToken){
-    $http({
+    new Http({
       url:"https://api.github.com/user?access_token="+accessToken,
       method:"GET"
-    }).success(function(data){
+    }).ajax().then(function(data){
       new Storage("userId").setItem(data.login).then(function(){
         self._fetchGists().catch(function(){
           console.log("error");
         });
       });
-    }).error(function(data){
+    }).catch(function(data){
       console.log(data);
     });
   });
@@ -559,20 +554,19 @@ GistAPI.prototype._initUserData = function(){
  * gistからデータを取得します。
  */
 GistAPI.prototype._fetchGists = function(){
-  var $http = this._$http;
   return new Promise(function(resolve, reject){
     new Storage("userId").getItem().then(function(userId){
       new Storage("accessToken").getItem().then(function(accessToken){
-        $http({
+        new Http({
           url:"https://api.github.com/users/"+userId+"/gists",
           method:"GET",
           headers: {
             Authorization: "token "+accessToken
           }
-        }).success(function(gists){
+        }).ajax().then(function(gists){
           new Storage("gist").setItem(gists);
           resolve(gists);
-        }).error(function(){
+        }).catch(function(){
           new Storage("gist").getItem().then(function(gists){
             resolve(gists);
           }).catch(function(){
@@ -620,4 +614,32 @@ Storage.prototype.getItem = function(){
 };
 Storage.prototype.removeItem = function(){
   return localforage.removeItem(this._key);
+}
+
+
+/**
+ * APIと通信する為のクラスです。
+ */
+class Http{
+	constructor(param){
+		this._ajax = {
+			url: 'url' in param ? param.url : "",
+			method: 'method' in param ? param.method : 'GET',
+			headers: 'headers' in param ? param.headers : {},
+			data: 'data' in param ? param.data : {},
+		};
+	}
+
+	ajax(){
+		//TODO いい感じでXHRを使いまわしてくれる
+		return new Promise((resolve, reject) => {
+			$.ajax(this._ajax)
+            .done(function(data){
+				resolve(data);
+            })
+            .fail(function(){
+				reject();
+            });
+		});
+	}
 }
