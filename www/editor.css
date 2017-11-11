@@ -1,0 +1,38 @@
+/*
+body, textarea{
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+}
+
+.menu{
+  position: fixed;
+  width: 100%;
+  height: 20%;
+  background-color: aqua;
+}
+*/
+
+html, body, [ng-show="showEditor"]{
+  height: 100%;
+}
+
+.editor{
+  height: 80%;
+}
+
+.editor_header{
+  height: 9%;
+}
+
+.editor_body {
+  height: 91%;
+}
+
+.editor_body_add_search{
+  height: 81%;
+}
+
+.editor_search{
+  height: 10%;
+}
