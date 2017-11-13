@@ -101,7 +101,7 @@ ark.controller("saveController", ['$scope', '$http', '$timeout', function($scope
       };
 
       //TODO gistapiに移動する
-      $http({
+      new Http({
         url:"https://api.github.com/gists/"+selectedGist.gistId,
         method:"PATCH",
         data:{
@@ -110,12 +110,12 @@ ark.controller("saveController", ['$scope', '$http', '$timeout', function($scope
         headers: {
           Authorization: "token "+accessToken
         }
-      }).success(function(){
+      }).ajax().then(function(){
         $scope.offline = false;
         $scope.showConflict = false;
         undo.addLayout($scope.editor);
         saved();
-      }).error(function(){
+      }).catch(function(){
         undo.addLayout($scope.editor);
         $scope.offline = true;
         saved();
@@ -299,7 +299,40 @@ GistAPI.prototype.createGist = function(gistName, text){
       });
     }.bind(this));
   }.bind(this));
-}
+};
+GistAPI.prototype.saveGist = function(selectedGist, editor){
+	new Storage(selectedGist.gistId+selectedGist.file.filename).setItem(editor);
+
+	new Storage("accessToken").getItem().then(function(accessToken){
+		console.log(accessToken);
+
+		var files = {};
+
+		files[selectedGist.file.filename] = {
+			content:editor
+		};
+
+		new Http({
+			url:"https://api.github.com/gists/"+selectedGist.gistId,
+			method:"PATCH",
+			data:{
+				files:files
+			},
+			headers: {
+				Authorization: "token "+accessToken
+			}
+		}).ajax().then(function(){
+			$scope.offline = false;
+			$scope.showConflict = false;
+			undo.addLayout($scope.editor);
+			saved();
+		}).catch(function(){
+			undo.addLayout($scope.editor);
+			$scope.offline = true;
+			saved();
+		});
+	});
+};
 /**
  * ファイルをリネームします
  * @param gistId
@@ -625,9 +658,14 @@ class Http{
 		this._ajax = {
 			url: 'url' in param ? param.url : "",
 			method: 'method' in param ? param.method : 'GET',
-			headers: 'headers' in param ? param.headers : {},
-			data: 'data' in param ? param.data : {},
+			data: JSON.stringify('data' in param ? param.data : {}),
 		};
+
+		this._ajax.beforeSend = function(xhr){
+		    for(var key in param.headers){
+				xhr.setRequestHeader(key, param.headers[key]);
+			}
+        };
 	}
 
 	ajax(){
