@@ -89,37 +89,17 @@ ark.controller("saveController", ['$scope', '$http', '$timeout', function($scope
       return;
     }
 
-    new Storage(selectedGist.gistId+selectedGist.file.filename).setItem($scope.editor);
-    
-    new Storage("accessToken").getItem().then(function(accessToken){
-      console.log(accessToken);
-
-      var files = {};
-
-      files[selectedGist.file.filename] = {
-        content:$scope.editor
-      };
-
-      //TODO gistapiに移動する
-      $http({
-        url:"https://api.github.com/gists/"+selectedGist.gistId,
-        method:"PATCH",
-        data:{
-          files:files
-        },
-        headers: {
-          Authorization: "token "+accessToken
-        }
-      }).success(function(){
-        $scope.offline = false;
-        $scope.showConflict = false;
-        undo.addLayout($scope.editor);
-        saved();
-      }).error(function(){
-        undo.addLayout($scope.editor);
-        $scope.offline = true;
-        saved();
-      });
+    api.saveGist(selectedGist, $scope.editor).then(function(){
+		$scope.offline = false;
+		$scope.showConflict = false;
+		undo.addLayout($scope.editor);
+		saved();
+		$scope.$apply();
+    }).catch(function(){
+		undo.addLayout($scope.editor);
+		$scope.offline = true;
+		saved();
+		$scope.$apply();
     });
   };
 
@@ -299,7 +279,37 @@ GistAPI.prototype.createGist = function(gistName, text){
       });
     }.bind(this));
   }.bind(this));
-}
+};
+GistAPI.prototype.saveGist = function(selectedGist, editor){
+	new Storage(selectedGist.gistId+selectedGist.file.filename).setItem(editor);
+
+	return new Promise(function(resolve, reject){
+		new Storage("accessToken").getItem().then(function(accessToken){
+			console.log(accessToken);
+
+			var files = {};
+
+			files[selectedGist.file.filename] = {
+				content:editor
+			};
+
+			new Http({
+				url:"https://api.github.com/gists/"+selectedGist.gistId,
+				method:"PATCH",
+				data:{
+					files:files
+				},
+				headers: {
+					Authorization: "token "+accessToken
+				}
+			}).ajax().then(function(data){
+				resolve(data);
+			}).catch(function(){
+				reject();
+			});
+		});
+    });
+};
 /**
  * ファイルをリネームします
  * @param gistId
@@ -625,13 +635,17 @@ class Http{
 		this._ajax = {
 			url: 'url' in param ? param.url : "",
 			method: 'method' in param ? param.method : 'GET',
-			headers: 'headers' in param ? param.headers : {},
-			data: 'data' in param ? param.data : {},
+			data: JSON.stringify('data' in param ? param.data : {}),
 		};
+
+		this._ajax.beforeSend = function(xhr){
+		    for(var key in param.headers){
+				xhr.setRequestHeader(key, param.headers[key]);
+			}
+        };
 	}
 
 	ajax(){
-		//TODO いい感じでXHRを使いまわしてくれる
 		return new Promise((resolve, reject) => {
 			$.ajax(this._ajax)
             .done(function(data){
