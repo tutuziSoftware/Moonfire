@@ -9,6 +9,7 @@
     <!-- Path to Framework7 Library CSS-->
     <link rel="stylesheet" href="framework7/css/framework7.ios.min.css">
     <link rel="stylesheet" href="framework7/css/framework7.ios.colors.min.css">
+    <link rel="stylesheet" href="framework7/css/framework7-icons.css">
     <!-- Path to your custom app styles-->
     <link rel="stylesheet" href="framework7/css/my-app.css">
   </head>
@@ -34,7 +35,11 @@
       <div class="view view-main">
         <div class="navbar">
           <div class="navbar-inner">
-            <!-- We have home navbar without left link-->
+            <div class="left">
+              <a href="editor.html?mode=newMemo" class="link icon-only">
+                <i class="f7-icons">add</i>
+              </a>
+            </div>
             <div class="center sliding">Ark for iOS</div>
             <div class="right">
               <a href="#" class="link icon-only open-panel">
@@ -48,16 +53,7 @@
           <div data-page="index" class="page">
             <div class="page-content">
               <div class="list-block">
-                <ul>
-                  <li class="swipeout">
-                    <a href="editor.html" class="item-link">
-                      <div class="item-content">
-                        <div class="item-inner">
-                          <div class="item-title">メモ</div>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
+                <ul id="memoList">
                 </ul>
               </div>
             </div>
@@ -67,13 +63,24 @@
     </div>
 
 
-
+    <script id="memoTemplate" type="text/template7">
+		<li class="swipeout">
+			<a href="editor.html?id={{id}}" class="item-link">
+              <div class="item-content">
+                <div class="item-inner">
+                  <div class="item-title">{{title}}</div>
+                </div>
+              </div>
+			</a>
+        </li>
+    </script>
 
     <!-- Path to Framework7 Library JS-->
     <script type="text/javascript" src="framework7/js/framework7.min.js"></script>
     <script type="text/javascript" src="localforage.min.js"></script>
     <script type="text/javascript" src="gistapi.js"></script>
     <script type="text/javascript" src="model.js"></script>
+    <script type="text/javascript" src="view.js"></script>
     <!-- Path to your app js-->
     <script type="text/javascript" src="my-app.js"></script>
   </body>
