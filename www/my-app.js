@@ -26,26 +26,42 @@ var mainView = myApp.addView('.view-main', {
 
 myApp.onPageInit('editor', function (page) {
 	if(page.query.id !== void 0){
-		//IDが指定された場合
+		/*
+		 * 既存のメモ
+		 */
 
 		//一意ID
 		var memoId = page.query.id;
 
 		//データ保存
 		$$('#save').on('click', function () {
-			saveGist(memoId, $$('#editor').html());
+			saveGist({
+				id:page.query.id,
+				title:$$('#editor').children()[0].innerText,
+				text:$$('#editor').html(),
+			});
 		});
 
 		//データ取得
-		getGist(memoId).then(function(text){
-			$$('#editor').html(text);
+		getGist(memoId).then(function(memo){
+			$$('#editor').html(memo.text);
 		});
 	}else if(page.query.mode === 'newMemo'){
-		//新しいメモが作成された時
+		/*
+		 * 新しいメモ
+		 */
 
 		//データ保存
-		$$('#save').on('click', function () {
-			saveGist('test', $$('#editor').html());
+		$$('#save').on('click', function(){
+			var id = '';//TODO 仮
+			var title = $$('#editor').children()[0].innerText;
+			var text = $$('#editor').html();
+
+			saveGist({
+				id:id,
+				title:title,
+				text:text,
+			});
 		});
 	}
 });
