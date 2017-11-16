@@ -53,7 +53,7 @@ myApp.onPageInit('editor', function (page) {
 
 		//データ保存
 		$$('#save').on('click', function(){
-			var id = '';//TODO 仮
+			var id = Date.now()+'';
 			var title = $$('#editor').children()[0].innerText;
 			var text = $$('#editor').html();
 
