@@ -64,4 +64,8 @@ myApp.onPageInit('editor', function (page) {
 			});
 		});
 	}
+
+	$$('#editor').on('keyup', function(){
+		view.htmlTitle();
+	});
 });
