@@ -40,6 +40,8 @@ myApp.onPageInit('editor', function (page) {
 				title:$$('#editor').children()[0].innerText,
 				text:$$('#editor').html(),
 			});
+
+			controller.reloadMemoList();
 		});
 
 		//データ取得
@@ -62,6 +64,8 @@ myApp.onPageInit('editor', function (page) {
 				title:title,
 				text:text,
 			});
+
+			controller.reloadMemoList();
 		});
 	}
 

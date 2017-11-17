@@ -8,6 +8,10 @@ view.showMemoList = function(texts){
 	});
 };
 
+view.clearMemoList = function(){
+	$$('#memoList').empty();
+};
+
 /**
  * エディタの1行目を必ず<div>で覆う為の関数です。
  *
