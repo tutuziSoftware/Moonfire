@@ -24,8 +24,7 @@
     <div class="panel panel-left panel-reveal">
       <div class="content-block">
         <p>Left panel content goes here</p>
-        <ul>
-          <li>メモ</li>
+        <ul id="leftMemoList">
         </ul>
       </div>
     </div>
@@ -72,6 +71,14 @@
                 </div>
               </div>
 			</a>
+        </li>
+    </script>
+
+    <script id="leftMemoListTemplate" type="text/template7">
+        <li class="swipeout">
+            <a href="editor.html?id={{id}}" class="item-link close-panel">
+                {{title}}
+            </a>
         </li>
     </script>
 

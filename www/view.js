@@ -13,6 +13,16 @@ view.clearMemoList = function(){
 };
 
 /**
+ * 左パネルにメモ一覧を表示します
+ */
+view.showLeftMemoList = function(memos){
+	memos.forEach(function(memo){
+		var leftMemoListTemplate = Template7.templates.leftMemoListTemplate(memo);
+		$$('#leftMemoList').append(leftMemoListTemplate);
+	});
+};
+
+/**
  * エディタの1行目を必ず<div>で覆う為の関数です。
  *
  * memo: 適切な関数名が思いつかなかった……。あとこれはviewがやることなのか？

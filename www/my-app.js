@@ -23,6 +23,17 @@ var mainView = myApp.addView('.view-main', {
 	});
 })();
 
+/**
+ * 左パネルのメモ一覧を取得します
+ */
+(function(){
+	model.getGistAll().then(function(memos){
+		view.showLeftMemoList(memos);
+	}).catch(function(){
+		console.log('getGistAll error');
+	});
+})();
+
 
 myApp.onPageInit('editor', function (page) {
 	if(page.query.id !== void 0){
