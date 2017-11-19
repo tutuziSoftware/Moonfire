@@ -24,11 +24,27 @@ var mainView = myApp.addView('.view-main', {
 })();
 
 /**
- * 左パネルのメモ一覧を取得します
+ * 左パネルのメモ一覧に関するもの
  */
 (function(){
 	model.getGistAll().then(function(memos){
+		//表示
 		view.showLeftMemoList(memos);
+
+		//左パネルからメモを表示
+		$$('.leftMemo').on('click', function(){
+			if(mainView.history[mainView.history.length-1].match(/editor.html/)){
+				//pageがeditor.htmlの場合
+				var id = this.dataset.id;
+				mainView.router.reloadPage('editor.html?id='+id);
+			}else{
+				//pageがeditor.html以外の場合
+				var id = this.dataset.id;
+				mainView.router.load({
+					url:'editor.html?id='+id,
+				});
+			}
+		});
 	}).catch(function(){
 		console.log('getGistAll error');
 	});
