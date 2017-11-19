@@ -54,10 +54,31 @@ var mainView = myApp.addView('.view-main', {
  * 右パネル
  */
 (function(){
-	var testMenu = [{
-		pageName:'TODO',
-		pageHtml:'todo.html'
-	}];
+	//最初はメニュー呼び出し
+	var testMenu = {
+		templateName:'rightMenuTemplate',
+		templateData:{
+			menus:[{
+				menuName:'TODO',
+			}],
+		},
+		onAfter:function(rightPanel){
+			//TODO メニューが複数になったらループする
+			rightPanel.find('#menu0').on('click', function(){
+				view.clearRightPanel();
+				view.showRightPanel({
+					templateName:'todoTemplate',
+					templateData:{
+						//TODO ここはメモからデータを取得して結びつける。メモのIDはURLから求める
+						todos:[{
+							todoName:'てすと',
+							checked:false,
+						}]
+					}
+				});
+			});
+		}
+	};
 
 	view.showRightPanel(testMenu);
 })();

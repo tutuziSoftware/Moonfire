@@ -31,9 +31,7 @@
 
     <!-- 右パネル -->
     <div class="panel panel-right panel-reveal">
-        <div class="content-block">
-            <p>メニュー</p>
-            <ul id="rightMenu"></ul>
+        <div id="rightPanel" class="content-block">
         </div>
     </div>
 
@@ -92,10 +90,31 @@
 
     <!-- 右パネルの一覧 -->
     <script id="rightMenuTemplate" type="text/template7">
-        <li class="swipeout">
-            <a href="">{{pageName}}</a>
-        </li>
+        <p>メニュー</p>
+        <ul>
+            {{#each menus}}
+            <li class="swipeout">
+                <a id="menu{{@index}}" href="#">{{menuName}}</a>
+            </li>
+            {{/each}}
+        </ul>
     </script>
+
+    <!-- TODOリスト -->
+    <script id="todoTemplate" type="text/template7">
+        <p>TODO</p>
+        <ul>
+            {{#each todos}}
+            <li class="swipeout">
+                <label>
+                    <input type="checkbox">
+                    {{todoName}}
+                </label>
+            </li>
+            {{/each}}
+        </ul>
+    </script>
+
 
     <!-- Path to Framework7 Library JS-->
     <script type="text/javascript" src="framework7/js/framework7.min.js"></script>

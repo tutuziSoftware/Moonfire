@@ -1,3 +1,8 @@
+/**
+ * 表示に関するAPI。
+ * 基本的に見た目はこれを介在する事。
+ * @type {{}}
+ */
 var view = {};
 
 view.showMemoList = function(texts){
@@ -23,13 +28,28 @@ view.showLeftMemoList = function(memos){
 };
 
 /**
- * 右パネルにメニューを表示します
+ * 右パネルにメニューを表示します。
+ * @param menu {
+ * 		templateName:'テンプレート名',
+ * 		templateData:{
+ * 			//テンプレートに流すデータ
+ *	 	},
+ *	 	onAfter(optional):function(rightPanel){
+ *	 		//テンプレート作成後に実行されるイベント
+ *	 		//rightPanel: jQueryもどき。イベントを仕掛ける用
+ *		}
+ * }
  */
-view.showRightPanel = function(menus){
-	menus.forEach(function(menu){
-		$$('#rightMenu').append(Template7.templates.rightMenuTemplate(menu));
-	});
+view.showRightPanel = function(menu){
+	var template = Template7.templates[menu.templateName](menu.templateData);
+	var rightPanel = $$('#rightPanel').append(template);
+
+	menu.onAfter && menu.onAfter(rightPanel);
 };
+
+view.clearRightPanel = function(){
+	$$('#rightPanel').empty();
+}
 
 /**
  * エディタの1行目を必ず<div>で覆う為の関数です。
