@@ -50,6 +50,17 @@ var mainView = myApp.addView('.view-main', {
 	});
 })();
 
+/**
+ * 右パネル
+ */
+(function(){
+	var testMenu = [{
+		pageName:'TODO',
+		pageHtml:'todo.html'
+	}];
+
+	view.showRightPanel(testMenu);
+})();
 
 myApp.onPageInit('editor', function (page) {
 	if(page.query.id !== void 0){

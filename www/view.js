@@ -23,6 +23,15 @@ view.showLeftMemoList = function(memos){
 };
 
 /**
+ * 右パネルにメニューを表示します
+ */
+view.showRightPanel = function(menus){
+	menus.forEach(function(menu){
+		$$('#rightMenu').append(Template7.templates.rightMenuTemplate(menu));
+	});
+};
+
+/**
  * エディタの1行目を必ず<div>で覆う為の関数です。
  *
  * memo: 適切な関数名が思いつかなかった……。あとこれはviewがやることなのか？
