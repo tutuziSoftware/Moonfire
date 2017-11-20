@@ -103,21 +103,29 @@
     <!-- TODOリスト -->
     <script id="todoTemplate" type="text/template7">
         <p>
-            <a href="editor.html?mode=newMemo" class="link icon-only">
+            <a id="todoAdd" href="#" class="link icon-only">
                 <i class="f7-icons">add</i>
             </a>
             TODO
         </p>
-        <ul>
+        <ul id="todoList">
             {{#each tasks}}
             <li class="swipeout">
                 <label>
                     <input type="checkbox">
-                    {{name}}
+                    <input name="todoListElement" value="{{name}}">
                 </label>
             </li>
             {{/each}}
         </ul>
+    </script>
+    <script id="todoListElementTemplate" type="text/template7">
+        <li class="swipeout">
+            <label>
+                <input type="checkbox">
+                <input name="todoListElement" value="{{name}}">
+            </label>
+        </li>
     </script>
 
 
@@ -128,6 +136,7 @@
     <script type="text/javascript" src="model.js"></script>
     <script type="text/javascript" src="view.js"></script>
     <script type="text/javascript" src="controller.js"></script>
+    <script type="text/javascript" src="jsetc/todo.js"></script>
     <!-- Path to your app js-->
     <script type="text/javascript" src="my-app.js"></script>
   </body>

@@ -64,24 +64,8 @@ var mainView = myApp.addView('.view-main', {
 		},
 		onAfter:function(rightPanel){
 			//TODO メニューが複数になったらループする
-			rightPanel.find('#menu0').on('click', function(){
-				var id = $$('#memoId').val();
-
-				view.clearRightPanel();
-
-				model.getGist(id).then(function(memo){
-					var tasks = memo.etc.todo.tasks;
-
-					view.showRightPanel({
-						templateName:'todoTemplate',
-						templateData:{
-							tasks:tasks
-						}
-					});
-				}).catch(function(){
-					console.log('getGist error');
-				});
-			});
+			var todoEntry = todo.rightMenuEntry;
+			rightPanel.find('#menu0').on(todoEntry.event, todoEntry.listener);
 		}
 	};
 
@@ -99,19 +83,17 @@ myApp.onPageInit('editor', function (page) {
 
 		//データ保存
 		$$('#save').on('click', function () {
-			saveGist({
-				id:page.query.id,
-				title:$$('#editor').children()[0].innerText,
-				text:$$('#editor').html(),
-				etc:{
-					todo:{
-						tasks:[
-							{
-								name:'test todo',
-							},
-						]
-					}
-				},
+			model.getGist(memoId).then(function(memo){
+				saveGist({
+					id:page.query.id,
+					title:$$('#editor').children()[0].innerText,
+					text:$$('#editor').html(),
+					etc:{
+						todo:memo.etc.todo
+					},
+				});
+			}).catch(function () {
+				console.log('model.getGist error');
 			});
 
 			controller.reloadMemoList();
@@ -133,19 +115,15 @@ myApp.onPageInit('editor', function (page) {
 			var title = $$('#editor').children()[0].innerText;
 			var text = $$('#editor').html();
 
+			var etc = {
+				etc:Object.assign({}, todo.createFirstTemplate)
+			};
+
 			saveGist({
 				id:id,
 				title:title,
 				text:text,
-				etc:{
-					todo:{
-						tasks:[
-							{
-								name:'test todo',
-							},
-						]
-					}
-				},
+				etc:etc,
 			});
 
 			controller.reloadMemoList();
