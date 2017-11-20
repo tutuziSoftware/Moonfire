@@ -31,6 +31,8 @@ function getGist(id){
 	return localMemo.getItem(id);
 }
 
+model.getGist = getGist;
+
 /**
  * すべてのメモを返します。
  * @returns {Promise}
@@ -65,7 +67,7 @@ model.getGistAll = function(){
  * @private
  */
 model._checkMemo = function(arg){
-	['id', 'title', 'text'].every(function(key){
+	['id', 'title', 'text', 'etc'].every(function(key){
 		return key in arg;
 	});
 };

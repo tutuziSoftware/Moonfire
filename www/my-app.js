@@ -65,16 +65,21 @@ var mainView = myApp.addView('.view-main', {
 		onAfter:function(rightPanel){
 			//TODO メニューが複数になったらループする
 			rightPanel.find('#menu0').on('click', function(){
+				var id = $$('#memoId').val();
+
 				view.clearRightPanel();
-				view.showRightPanel({
-					templateName:'todoTemplate',
-					templateData:{
-						//TODO ここはメモからデータを取得して結びつける。メモのIDはURLから求める
-						todos:[{
-							todoName:'てすと',
-							checked:false,
-						}]
-					}
+
+				model.getGist(id).then(function(memo){
+					var tasks = memo.etc.todo.tasks;
+
+					view.showRightPanel({
+						templateName:'todoTemplate',
+						templateData:{
+							tasks:tasks
+						}
+					});
+				}).catch(function(){
+					console.log('getGist error');
 				});
 			});
 		}
@@ -98,6 +103,15 @@ myApp.onPageInit('editor', function (page) {
 				id:page.query.id,
 				title:$$('#editor').children()[0].innerText,
 				text:$$('#editor').html(),
+				etc:{
+					todo:{
+						tasks:[
+							{
+								name:'test todo',
+							},
+						]
+					}
+				},
 			});
 
 			controller.reloadMemoList();
@@ -106,6 +120,7 @@ myApp.onPageInit('editor', function (page) {
 		//データ取得
 		getGist(memoId).then(function(memo){
 			$$('#editor').html(memo.text);
+			$$('#memoId').val(memo.id);
 		});
 	}else if(page.query.mode === 'newMemo'){
 		/*
@@ -122,6 +137,15 @@ myApp.onPageInit('editor', function (page) {
 				id:id,
 				title:title,
 				text:text,
+				etc:{
+					todo:{
+						tasks:[
+							{
+								name:'test todo',
+							},
+						]
+					}
+				},
 			});
 
 			controller.reloadMemoList();

@@ -102,13 +102,18 @@
 
     <!-- TODOリスト -->
     <script id="todoTemplate" type="text/template7">
-        <p>TODO</p>
+        <p>
+            <a href="editor.html?mode=newMemo" class="link icon-only">
+                <i class="f7-icons">add</i>
+            </a>
+            TODO
+        </p>
         <ul>
-            {{#each todos}}
+            {{#each tasks}}
             <li class="swipeout">
                 <label>
                     <input type="checkbox">
-                    {{todoName}}
+                    {{name}}
                 </label>
             </li>
             {{/each}}
