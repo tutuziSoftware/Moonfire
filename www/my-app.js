@@ -83,17 +83,10 @@ myApp.onPageInit('editor', function (page) {
 
 		//データ保存
 		$$('#save').on('click', function () {
-			model.getGist(memoId).then(function(memo){
-				saveGist({
-					id:page.query.id,
-					title:$$('#editor').children()[0].innerText,
-					text:$$('#editor').html(),
-					etc:{
-						todo:memo.etc.todo
-					},
-				});
-			}).catch(function () {
-				console.log('model.getGist error');
+			model.saveGist({
+				id:page.query.id,
+				title:$$('#editor').children()[0].innerText,
+				text:$$('#editor').html(),
 			});
 
 			controller.reloadMemoList();
@@ -115,15 +108,10 @@ myApp.onPageInit('editor', function (page) {
 			var title = $$('#editor').children()[0].innerText;
 			var text = $$('#editor').html();
 
-			var etc = {
-				etc:Object.assign({}, todo.createFirstTemplate)
-			};
-
-			saveGist({
+			model.saveGist({
 				id:id,
 				title:title,
 				text:text,
-				etc:etc,
 			});
 
 			controller.reloadMemoList();

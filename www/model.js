@@ -12,8 +12,8 @@ var localMemo = localforage.createInstance({
  * @param write {id:'',title:'',memo:''}
  * @returns Promise
  */
-function saveGist(write){
-	if(model._checkMemo(write)){
+model.saveGist = function(write){
+	if(model._checkMemo(write) === false){
 		console.log('error saveGist');
 		return;
 	}
@@ -67,7 +67,7 @@ model.getGistAll = function(){
  * @private
  */
 model._checkMemo = function(arg){
-	['id', 'title', 'text', 'etc'].every(function(key){
+	return ['id', 'title', 'text'].every(function(key){
 		return key in arg;
 	});
 };

@@ -111,9 +111,9 @@
         <ul id="todoList">
             {{#each tasks}}
             <li class="swipeout">
-                <label>
-                    <input type="checkbox">
-                    <input name="todoListElement" value="{{name}}">
+                <label class="todoListBox">
+                    <input name="todoListChecked" type="checkbox" {{#if checked}}checked{{/if}}>
+                    <input name="todoListTaskName" value="{{name}}">
                 </label>
             </li>
             {{/each}}
@@ -121,9 +121,9 @@
     </script>
     <script id="todoListElementTemplate" type="text/template7">
         <li class="swipeout">
-            <label>
-                <input type="checkbox">
-                <input name="todoListElement" value="{{name}}">
+            <label class="todoListBox">
+                <input name="todoListChecked" type="checkbox">
+                <input name="todoListTaskName" value="{{name}}">
             </label>
         </li>
     </script>
