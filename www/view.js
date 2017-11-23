@@ -52,6 +52,13 @@ view.clearRightPanel = function(){
 }
 
 /**
+ * codeの入力画面を表示します。
+ */
+view.showCodeForm = function(){
+	mainView.router.loadPage('gist_code.html');
+};
+
+/**
  * エディタの1行目を必ず<div>で覆う為の関数です。
  *
  * memo: 適切な関数名が思いつかなかった……。あとこれはviewがやることなのか？

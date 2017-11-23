@@ -5,6 +5,29 @@ var localMemo = localforage.createInstance({
 	name:"memo"
 });
 
+var gistApi = new GistAPI;
+
+
+/**
+ * Gistのアクセストークンを取得します。
+ * @returns {*}
+ */
+model.getAccessToken = function(){
+	var localAccessToken = localforage.createInstance({
+		name:"gistAccessToken"
+	});
+
+	return localAccessToken.getItem('accessToken');
+};
+
+model.initAccessToken = function(){
+	gistApi.initAccessToken();
+};
+
+model.setCode = function(code){
+	return gistApi.setCode(code);
+};
+
 
 /**
  * ユーザ入力を保存します。

@@ -13,6 +13,36 @@ var mainView = myApp.addView('.view-main', {
 	dynamicNavbar: true
 });
 
+/**
+ * アクセストークン確認
+ */
+(function(){
+	model.getAccessToken().then(function(accessToken){
+		if(accessToken === null){
+			model.initAccessToken();
+			view.showCodeForm();
+		}
+	}).catch(function(){
+		console.log('model.getAccessToken().catch');
+	});
+})();
+
+myApp.onPageInit('gist_code', function(page){
+	/**
+	 * code入力確認ボタン
+	 */
+	$$('#code_submit').on('click', function(){
+		var codeForm = myApp.formToData('#code_form');
+		var code = codeForm.code;
+
+		model.setCode(code).then(function(){
+			mainView.router.back();
+		}).catch(function(){
+			alert('code error!');
+		});
+	});
+});
+
 
 /**
  * メモ一覧取得

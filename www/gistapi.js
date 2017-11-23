@@ -1,12 +1,46 @@
-function GistAPI($http){
-	this._$http = $http;
-
-	new Storage("accessToken").getItem().then(function(accessToken){
-		this._accessToken = accessToken;
+function GistAPI(){
+	var localAccessToken = localforage.createInstance({
+		name:'gistAccessToken',
+	});
+	localAccessToken.getItem('accessToken').then(function(accessToken){
+		if(accessToken !== null){
+			this._accessToken = accessToken;
+		}else{
+			console.log('Gist accessToken not found');
+		}
 	}).catch(function(){
-		this._initOauth($http);
+		console.log('localAccessToken.getItem("accessToken").catch');
 	});
 }
+GistAPI.prototype.initAccessToken = function(){
+	window.open("https://github.com/login/oauth/authorize?client_id=b3acd7e486cdddfc9a7d&scope=gist", "_blank");
+};
+GistAPI.prototype.setCode = function(code){
+	return new Promise(function(resolve, reject){
+		$$.ajax({
+			url:"https://github.com/login/oauth/access_token",
+			method:"POST",
+			data:{
+				client_id:"b3acd7e486cdddfc9a7d",
+				client_secret:"c59721ff0a3e25b174570e43da4070cca81fabb9",
+				code:code
+			},
+			success:function(accessTokenParam){
+				var accessToken = accessTokenParam.match(/access_token=([^&]*)/)[1];
+
+				//アクセストークン保存
+				var localAccessToken = localforage.createInstance({
+					name:'gistAccessToken',
+				});
+				localAccessToken.setItem('accessToken', accessToken);
+				resolve();
+			},
+			error:function(){
+				reject();
+			}
+		});
+	});
+};
 GistAPI.prototype.createGist = function(gistName, text){
 	return new Promise(function(resolve, reject){
 		new Storage("accessToken").getItem().then(function(accessToken){
