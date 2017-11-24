@@ -48,8 +48,8 @@ myApp.onPageInit('gist_code', function(page){
  * メモ一覧取得
  */
 (function(){
-	model.getGistAll().then(function(texts){
-		view.showMemoList(texts);
+	model.getProjectAll().then(function(projects){
+		view.showMemoList(projects);
 	});
 })();
 
@@ -57,7 +57,7 @@ myApp.onPageInit('gist_code', function(page){
  * 左パネルのメモ一覧に関するもの
  */
 (function(){
-	model.getGistAll().then(function(memos){
+	model.getProjectAll().then(function(memos){
 		//表示
 		view.showLeftMemoList(memos);
 

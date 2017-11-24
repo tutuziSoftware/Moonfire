@@ -60,28 +60,8 @@ model.getGist = getGist;
  * すべてのメモを返します。
  * @returns {Promise}
  */
-model.getGistAll = function(){
-	return new Promise(function(resolve, reject){
-		localMemo.keys().then(function(keys){
-			var memos = [];
-
-			keys.forEach(function(key){
-				localMemo.getItem(key).then(function(memo){
-					memos.push(memo);
-
-					if(memos.length === keys.length){
-						resolve(memos);
-					}
-				}).catch(function(){
-					console.log('localMemo.' + key + ' is catch');
-					reject();
-				});
-			});
-		}).catch(function(){
-			console.log('localMemo.keys() is catch');
-			reject();
-		});
-	});
+model.getProjectAll = function(){
+	return gistApi.getProjectAll();
 }
 
 /**

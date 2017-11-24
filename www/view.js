@@ -5,9 +5,14 @@
  */
 var view = {};
 
-view.showMemoList = function(texts){
-	texts.forEach(function(text){
-		var memo = Template7.templates.memoTemplate(text);
+view.showMemoList = function(projects){
+	projects.forEach(function(project){
+		var title = Object.keys(project.files)[0];
+
+		var memo = Template7.templates.memoTemplate({
+			id:project.id,
+			title:title,
+		});
 
 		$$('#memoList').append(memo);
 	});
@@ -20,9 +25,15 @@ view.clearMemoList = function(){
 /**
  * 左パネルにメモ一覧を表示します
  */
-view.showLeftMemoList = function(memos){
-	memos.forEach(function(memo){
-		var leftMemoListTemplate = Template7.templates.leftMemoListTemplate(memo);
+view.showLeftMemoList = function(projects){
+	projects.forEach(function(project){
+		var title = Object.keys(project.files)[0];
+
+		var leftMemoListTemplate = Template7.templates.leftMemoListTemplate({
+			id:project.id,
+			title:title,
+		});
+
 		$$('#leftMemoList').append(leftMemoListTemplate);
 	});
 };

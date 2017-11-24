@@ -118,6 +118,39 @@ GistAPI.prototype.saveRenameFile = function(gistId, file, newName){
 
 	return promise;
 };
+GistAPI.prototype.getProjectAll = function(){
+	return new Promise(function(resolve, reject){
+		new Storage('gistAccessToken').getItem('accessToken').then(function (accessToken) {
+			new Http({
+				url:"https://api.github.com/user?access_token="+accessToken,
+				method:"GET"
+			}).ajax().then(function (data) {
+				//TODO ここでユーザ名を特定してリスト取得
+				var userId = JSON.parse(data).login;
+
+				new Http({
+					url:"https://api.github.com/users/"+userId+"/gists",
+					method:"GET",
+					headers: {
+						Authorization: "token "+accessToken
+					}
+				}).ajax().then(function (list) {
+					var list = JSON.parse(list);
+					resolve(list);
+				}).catch(function () {
+					console.log("error https://api.github.com/users/"+userId+"/gists");
+					reject();
+				});
+			}).catch(function () {
+				console.log('error https://api.github.com/user');
+				reject();
+			});
+		}).catch(function () {
+			console.log("new Storage('accessToken').getItem().catch");
+			reject();
+		});
+	});
+};
 /**
  * ファイルを取得します。
  * @param gist
@@ -362,22 +395,21 @@ GistAPI.prototype._fetchGists = function(){
 /**
  * 永続ストレージにアクセスする為のクラスです。
  */
-function Storage(key){
-	this._key = key;
+function Storage(dbName){
+	this._storage = localforage.createInstance({
+		name: dbName
+	});
 }
-Storage.prototype.setItem = function(text){
-	console.log(this._key, text);
-	return localforage.setItem(this._key, text);
+Storage.prototype.setItem = function(key, text){
+	return this._storage.setItem(key, text);
 };
 /**
  * データを取得します。
  * データが存在しない場合、Promiseはcatchを返します。
  */
-Storage.prototype.getItem = function(){
-	var self = this;
-
-	return new Promise(function (resolve, reject){
-		localforage.getItem(self._key).then(function(data){
+Storage.prototype.getItem = function(key){
+	return new Promise((resolve, reject)=>{
+		this._storage.getItem(key).then(function(data){
 			if(data == null){
 				reject();
 			}else{
@@ -386,33 +418,35 @@ Storage.prototype.getItem = function(){
 		});
 	});
 };
-Storage.prototype.removeItem = function(){
-	return localforage.removeItem(this._key);
-}
+Storage.prototype.removeItem = function(key){
+	return this._storage.removeItem(key);
+};
+
 
 
 /**
  * APIと通信する為のクラスです。
  */
 class Http{
-	constructor(){
-		this.url = '';
-		this.method = 'GET';
+	constructor(param){
+		Object.keys(param).forEach((key)=>{
+			this[key] = param[key];
+		});
 	}
 
 	ajax(){
 		//TODO いい感じでXHRを使いまわしてくれる
-		return new Promise(function(resolve, reject){
-			reject();
+		return new Promise((resolve, reject)=>{
+			this.success = function (data) {
+				resolve(data);
+			};
+
+			this.error = function () {
+				reject();
+			};
+
+			$$.ajax(this);
 		});
-	}
-
-	set url(url){
-		//TODO いい感じでURLを保存してくれる
-	}
-
-	set method(method){
-		//TODO いい感じでメソッド指定してくれる
 	}
 
 	/**
