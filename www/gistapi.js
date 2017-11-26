@@ -1,17 +1,28 @@
-function GistAPI(){
-	var localAccessToken = localforage.createInstance({
-		name:'gistAccessToken',
+function GistAPI(){}
+GistAPI.ACCESS_TOKEN_DB_NAME = 'GistAccessToken';
+/**
+ * アクセストークンをローカルに持っているかどうかを確認します。
+ * @returns {Promise}
+ * 				then :アクセストークン保有
+ * 				catch:アクセストークンなし
+ */
+GistAPI.prototype.checkAccessToken = function(){
+	return new Promise((resolve, reject)=>{
+		new Storage(GistAPI.ACCESS_TOKEN_DB_NAME).getItem('accessToken').then((accessToken)=>{
+			if(accessToken !== null){
+				this._accessToken = accessToken;
+				this._network = new GistApiNetwork();
+				this._cache = new GistApiCache();
+				resolve();
+			}else{
+				console.log('Gist accessToken not found');
+				reject();
+			}
+		}).catch(function(){
+			reject();
+		});
 	});
-	localAccessToken.getItem('accessToken').then(function(accessToken){
-		if(accessToken !== null){
-			this._accessToken = accessToken;
-		}else{
-			console.log('Gist accessToken not found');
-		}
-	}).catch(function(){
-		console.log('localAccessToken.getItem("accessToken").catch');
-	});
-}
+};
 GistAPI.prototype.initAccessToken = function(){
 	window.open("https://github.com/login/oauth/authorize?client_id=b3acd7e486cdddfc9a7d&scope=gist", "_blank");
 };
@@ -29,10 +40,8 @@ GistAPI.prototype.setCode = function(code){
 				var accessToken = accessTokenParam.match(/access_token=([^&]*)/)[1];
 
 				//アクセストークン保存
-				var localAccessToken = localforage.createInstance({
-					name:'gistAccessToken',
-				});
-				localAccessToken.setItem('accessToken', accessToken);
+				new Storage(GistAPI.ACCESS_TOKEN_DB_NAME).setItem('accessToken', accessToken);
+
 				resolve();
 			},
 			error:function(){
@@ -119,35 +128,38 @@ GistAPI.prototype.saveRenameFile = function(gistId, file, newName){
 	return promise;
 };
 GistAPI.prototype.getProjectAll = function(){
-	return new Promise(function(resolve, reject){
-		new Storage('gistAccessToken').getItem('accessToken').then(function (accessToken) {
-			new Http({
-				url:"https://api.github.com/user?access_token="+accessToken,
-				method:"GET"
-			}).ajax().then(function (data) {
-				//TODO ここでユーザ名を特定してリスト取得
-				var userId = JSON.parse(data).login;
-
-				new Http({
-					url:"https://api.github.com/users/"+userId+"/gists",
-					method:"GET",
-					headers: {
-						Authorization: "token "+accessToken
-					}
-				}).ajax().then(function (list) {
-					var list = JSON.parse(list);
-					resolve(list);
-				}).catch(function () {
-					console.log("error https://api.github.com/users/"+userId+"/gists");
-					reject();
+	return new Promise((resolve, reject)=>{
+		this._network.getProjectAll().then((networkProjects)=>{
+			this._cache.getProjectAll().then((cacheProjects)=>{
+				//TODO 時刻見て切り替えた方がいい。キャッシュが最新の場合がある
+				this._cache.clear();
+				networkProjects.forEach((networkProjects)=>{
+					this._cache.setItem(networkProjects.id, networkProjects);
 				});
-			}).catch(function () {
-				console.log('error https://api.github.com/user');
+				resolve({
+					isNetwork:true,
+					data:networkProjects,
+				});
+			}).catch(()=>{
+				//TODO ここも仮
+				this._cache.clear();
+				networkProjects.forEach((networkProject)=>{
+					this._cache.setItem(networkProject.id, networkProject);
+				});
+				resolve({
+					isNetwork:true,
+					data:networkProject,
+				});
+			});
+		}).catch(()=>{
+			this._cache.getProjectAll().then((cache)=>{
+				resolve({
+					isNetwork:false,
+					data:cache,
+				});
+			}).catch(()=>{
 				reject();
 			});
-		}).catch(function () {
-			console.log("new Storage('accessToken').getItem().catch");
-			reject();
 		});
 	});
 };
@@ -420,6 +432,12 @@ Storage.prototype.getItem = function(key){
 };
 Storage.prototype.removeItem = function(key){
 	return this._storage.removeItem(key);
+};
+Storage.prototype.keys = function(){
+	return this._storage.keys();
+}
+Storage.prototype.clear = function(){
+	return this._storage.clear();
 };
 
 

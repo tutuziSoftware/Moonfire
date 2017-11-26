@@ -13,72 +13,64 @@ var mainView = myApp.addView('.view-main', {
 	dynamicNavbar: true
 });
 
-/**
- * アクセストークン確認
- */
-(function(){
-	model.getAccessToken().then(function(accessToken){
-		if(accessToken === null){
-			model.initAccessToken();
-			view.showCodeForm();
-		}
-	}).catch(function(){
-		console.log('model.getAccessToken().catch');
-	});
-})();
+var gistApi = new GistAPI;
 
-myApp.onPageInit('gist_code', function(page){
+gistApi.checkAccessToken().then(function(){
 	/**
-	 * code入力確認ボタン
+	 * メモ一覧取得
 	 */
-	$$('#code_submit').on('click', function(){
-		var codeForm = myApp.formToData('#code_form');
-		var code = codeForm.code;
+	(function(){
+		gistApi.getProjectAll().then(function(projects){
+			view.showMemoList(projects.data);
+		});
+	})();
 
-		model.setCode(code).then(function(){
-			mainView.router.back();
+	/**
+	 * 左パネルのメモ一覧に関するもの
+	 */
+	(function(){
+		gistApi.getProjectAll().then(function(projects){
+			//表示
+			view.showLeftMemoList(projects.data);
+
+			//左パネルからメモを表示
+			$$('.leftMemo').on('click', function(){
+				if(mainView.history[mainView.history.length-1].match(/editor.html/)){
+					//pageがeditor.htmlの場合
+					var id = this.dataset.id;
+					mainView.router.reloadPage('editor.html?id='+id);
+				}else{
+					//pageがeditor.html以外の場合
+					var id = this.dataset.id;
+					mainView.router.load({
+						url:'editor.html?id='+id,
+					});
+				}
+			});
 		}).catch(function(){
-			alert('code error!');
+			console.log('getGistAll error');
+		});
+	})();
+}).catch(function(){
+	gistApi.initAccessToken();
+	view.showCodeForm();
+
+	myApp.onPageInit('gist_code', function(page){
+		/**
+		 * code入力確認ボタン
+		 */
+		$$('#code_submit').on('click', function(){
+			var codeForm = myApp.formToData('#code_form');
+			var code = codeForm.code;
+
+			model.setCode(code).then(function(){
+				mainView.router.back();
+			}).catch(function(){
+				alert('code error!');
+			});
 		});
 	});
 });
-
-
-/**
- * メモ一覧取得
- */
-(function(){
-	model.getProjectAll().then(function(projects){
-		view.showMemoList(projects);
-	});
-})();
-
-/**
- * 左パネルのメモ一覧に関するもの
- */
-(function(){
-	model.getProjectAll().then(function(memos){
-		//表示
-		view.showLeftMemoList(memos);
-
-		//左パネルからメモを表示
-		$$('.leftMemo').on('click', function(){
-			if(mainView.history[mainView.history.length-1].match(/editor.html/)){
-				//pageがeditor.htmlの場合
-				var id = this.dataset.id;
-				mainView.router.reloadPage('editor.html?id='+id);
-			}else{
-				//pageがeditor.html以外の場合
-				var id = this.dataset.id;
-				mainView.router.load({
-					url:'editor.html?id='+id,
-				});
-			}
-		});
-	}).catch(function(){
-		console.log('getGistAll error');
-	});
-})();
 
 /**
  * 右パネル
