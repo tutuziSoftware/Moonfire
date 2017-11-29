@@ -69,6 +69,16 @@ view.showCodeForm = function(){
 	mainView.router.loadPage('gist_code.html');
 };
 
+view.showFiles = function(projectFiles){
+	const files = projectFiles.files;
+
+	Object.keys(files).forEach(function(file){
+		files[file].id = projectFiles.id;
+		var template = Template7.templates.fileListTemplate(files[file]);
+		$$('#fileList').append(template);
+	});
+};
+
 /**
  * エディタの1行目を必ず<div>で覆う為の関数です。
  *

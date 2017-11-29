@@ -148,7 +148,7 @@ GistAPI.prototype.getProjectAll = function(){
 				});
 				resolve({
 					isNetwork:true,
-					data:networkProject,
+					data:networkProjects,
 				});
 			});
 		}).catch(()=>{
@@ -268,6 +268,23 @@ GistAPI.prototype.getFile = function(gist, file){
 	});
 
 	return promise;
+};
+GistAPI.prototype.getFiles = function(gistId){
+	if(gistId === void 0){
+		console.log('GistAPI.prototype.getFiles(undefined)');
+		return;
+	}
+
+	return new Promise(function(resolve, reject){
+		new Http({
+			url:"https://api.github.com/gists/"+gistId
+		}).ajax().then((json)=>{
+			resolve(JSON.parse(json));
+		}).catch(()=>{
+			//TODO ストレージから持ってくる
+			debugger;
+		});
+	});
 };
 /**
  * サーバ側のテキストを取得し、ローカルに保存しなおします。

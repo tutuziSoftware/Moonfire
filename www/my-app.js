@@ -144,3 +144,15 @@ myApp.onPageInit('editor', function (page) {
 		view.htmlTitle();
 	});
 });
+
+
+
+myApp.onPageInit('files', function (page){
+	var gistId = page.query.id;
+
+	gistApi.getFiles(gistId).then((files)=>{
+		view.showFiles(files);
+	}).catch(()=>{
+		console.log('gistApi.getFiles().catch');
+	});
+});

@@ -70,13 +70,25 @@
 
     <script id="memoTemplate" type="text/template7">
 		<li class="swipeout">
-			<a href="editor.html?id={{id}}" class="item-link">
+			<a href="files.html?id={{id}}" class="item-link">
               <div class="item-content">
                 <div class="item-inner">
                   <div class="item-title">{{title}}</div>
                 </div>
               </div>
 			</a>
+        </li>
+    </script>
+
+    <script id="fileListTemplate" type="text/template7">
+        <li class="swipeout">
+            <a href="editor.html?id={{id}}&raw_url={{raw_url}}" class="item-link">
+                <div class="item-content">
+                    <div class="item-inner">
+                        <div class="item-title">{{filename}}</div>
+                    </div>
+                </div>
+            </a>
         </li>
     </script>
 

@@ -4,8 +4,11 @@ class GistApiCache{
 			new Storage('project').keys().then(function(projectKeys){
 				if(projectKeys.length === 0) resolve([]);
 
-				projectKeys.forEach(function(){
+				const length = keys.length;
+
+				projectKeys.forEach(function(project){
 					//TODO メモリスト取得
+
 					debugger;
 				});
 			}).catch(function(){
