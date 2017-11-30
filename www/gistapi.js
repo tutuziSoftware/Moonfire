@@ -169,105 +169,17 @@ GistAPI.prototype.getProjectAll = function(){
  * @param file
  * @returns {Promise}
  */
-GistAPI.prototype.getFile = function(gist, file){
-	const self = this;
-	const $http = this._$http;
-
-	const promise = new Promise(function(resolve, reject){
-		const storage = new Storage(gist.id+file.filename);
-
-		storage.getItem().then(function(localText){
-			console.log("getFile:then");
-			fetch(localText);
-		}).catch(function(){
-			console.log("getFile:catch");
-			fetch();
+GistAPI.prototype.getFile = function(rawUrl){
+	return new Promise(function(resolve, reject){
+		new Http({
+			url:rawUrl
+		}).ajax().then((text)=>{
+			resolve(text);
+		}).catch(()=>{
+			debugger;
+			reject();
 		});
-
-		function fetch(localText){
-			$http({
-				url:"https://api.github.com/gists/"+gist.id
-			}).success(function(gist){
-				const LOCAL_FILE_EXIST = 1;
-				const SERVER_FILE_EXIST = 2;
-				const FILE_EXIST = 3;
-
-				const localFileExist = !!localText ? LOCAL_FILE_EXIST : 0;
-				const serverFileExist = (file.filename in gist.files) ? SERVER_FILE_EXIST : 0;
-				const fileExist = localFileExist + serverFileExist;
-
-				const mode = {};
-				mode[0] = function(){
-					reject("FILE_EXIST");
-				};
-				mode[LOCAL_FILE_EXIST] = function(){
-					resolve({
-						localText:localText,
-						text:localText
-					});
-				};
-				mode[SERVER_FILE_EXIST] = function(){
-					self._fetchRawUrl(file).then(function(text){
-						storage.setItem(text).then(function(){
-							resolve({
-								text:text
-							});
-						});
-					}).catch(function(error){
-						reject(error);
-					});
-				};
-				mode[FILE_EXIST] = function(){
-					self._fetchRawUrl(gist.files[file.filename]).then(function(serverText){
-						console.log(serverText == localText, serverText, localText);
-						if(serverText == localText){
-							resolve({
-								text:localText
-							});
-						}else{
-							resolve({
-								conflict:true,
-								serverText:serverText,
-								localText:localText,
-								text:localText
-							});
-						}
-					}).catch(function(error){
-						console.log("mode[FILE_EXIST]", error);
-						console.log("localText", localText);
-						if(localText != undefined){
-							resolve({
-								text: localText,
-								conflict: false
-							});
-						}else{
-							reject("NETWORK_ERROR");
-						}
-					});
-				};
-
-				console.log(fileExist);
-
-				if(mode[fileExist]){
-					mode[fileExist]();
-				}else{
-					reject("?_ERROR");
-				}
-			}).error(function(){
-				if(localText !== void 0){
-					resolve({
-						localText:localText,
-						text:localText
-					});
-				}else{
-					console.log("NETWORK_ERROR");
-					reject("NETWORK_ERROR")
-				}
-			});
-		}
 	});
-
-	return promise;
 };
 GistAPI.prototype.getFiles = function(gistId){
 	if(gistId === void 0){

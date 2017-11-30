@@ -115,9 +115,11 @@ myApp.onPageInit('editor', function (page) {
 		});
 
 		//データ取得
-		getGist(memoId).then(function(memo){
-			$$('#editor').html(memo.text);
-			$$('#memoId').val(memo.id);
+		gistApi.getFile(page.query.raw_url).then((memo)=>{
+			$$('#editor').html(memo.replace(/([^\n\r]*)\r?\n/g, '<div>$1</div>'));
+			$$('#memoId').val(memoId);
+		}).catch(()=>{
+			debugger;
 		});
 	}else if(page.query.mode === 'newMemo'){
 		/*
@@ -139,10 +141,6 @@ myApp.onPageInit('editor', function (page) {
 			controller.reloadMemoList();
 		});
 	}
-
-	$$('#editor').on('keyup', function(){
-		view.htmlTitle();
-	});
 });
 
 
