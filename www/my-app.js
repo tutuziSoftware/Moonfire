@@ -105,13 +105,13 @@ myApp.onPageInit('editor', function (page) {
 
 		//データ保存
 		$$('#save').on('click', function () {
-			model.saveGist({
+			gistApi.save({
 				id:page.query.id,
-				title:$$('#editor').children()[0].innerText,
+				fileName:page.query.filename,
 				text:$$('#editor').html(),
 			});
 
-			controller.reloadMemoList();
+			//controller.reloadMemoList();
 		});
 
 		//データ取得

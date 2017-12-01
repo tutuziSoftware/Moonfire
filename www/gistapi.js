@@ -228,6 +228,37 @@ GistAPI.prototype.reload = function(){
 
 	return promise;
 };
+GistAPI.prototype.save = function(_){
+	var save;
+	new Storage("GistAccessToken").getItem('accessToken').then((accessToken)=>{
+		save = new Promise(function(resolve, reject){
+			var data = {
+				"description": "テスト中",
+				"files": {}
+			};
+			data.files[_.fileName] = {
+				content:_.text
+			};
+
+			new Http({
+				url:"https://api.github.com/gists/"+_.id,
+				method:"PATCH",
+				data:JSON.stringify(data),
+				headers: {
+					Authorization: "token "+accessToken
+				}
+			}).ajax().then(()=>{
+				debugger;
+			}).catch(()=>{
+				debugger;
+			});
+		});
+	}).catch(()=>{
+		debugger;
+	})
+
+	return save;
+};
 /**
  * gistのファイルオブジェクトからテキストを取得します。
  * @param file
@@ -394,15 +425,5 @@ class Http{
 
 			$$.ajax(this);
 		});
-	}
-
-	/**
-	 * リクエストヘッダを格納します。
-	 */
-	set headers(hash){
-		//TODO いい感じでリクエストヘッダを識別してくれる
-		// headers: {
-		// 	Authorization: "token "+accessToken
-		// }
 	}
 }
