@@ -170,14 +170,25 @@ GistAPI.prototype.getProjectAll = function(){
  * @returns {Promise}
  */
 GistAPI.prototype.getFile = function(rawUrl){
-	return new Promise(function(resolve, reject){
-		new Http({
-			url:rawUrl
-		}).ajax().then((text)=>{
-			resolve(text);
+	return new Promise((resolve, reject)=>{
+		this._network.getFile(rawUrl).then((data)=>{
+			const cut = rawUrl.match(/.*\/([^/]*)\/raw\/.*\/([^/]*)$/);
+			const projectId = cut[1];
+			const fileName = cut[2];
+
+			this._cache.setFile({
+				id:projectId,
+				fileName:fileName,
+				text:data,
+			});
+
+			resolve(data);
 		}).catch(()=>{
-			debugger;
-			reject();
+			this._cache.then((cache)=>{
+				resolve(cache);
+			}).catch(()=>{
+				reject('CACHE_ERROR');
+			});
 		});
 	});
 };
@@ -229,35 +240,13 @@ GistAPI.prototype.reload = function(){
 	return promise;
 };
 GistAPI.prototype.save = function(_){
-	var save;
-	new Storage("GistAccessToken").getItem('accessToken').then((accessToken)=>{
-		save = new Promise(function(resolve, reject){
-			var data = {
-				"description": "テスト中",
-				"files": {}
-			};
-			data.files[_.fileName] = {
-				content:_.text
-			};
-
-			new Http({
-				url:"https://api.github.com/gists/"+_.id,
-				method:"PATCH",
-				data:JSON.stringify(data),
-				headers: {
-					Authorization: "token "+accessToken
-				}
-			}).ajax().then(()=>{
-				debugger;
-			}).catch(()=>{
-				debugger;
-			});
+	return new Promise((resolve, reject)=>{
+		this._network.save(_).then(()=>{
+			this._cache.setFile(_);
+		}).catch(()=>{
+			debugger;
 		});
-	}).catch(()=>{
-		debugger;
-	})
-
-	return save;
+	});
 };
 /**
  * gistのファイルオブジェクトからテキストを取得します。

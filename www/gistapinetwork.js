@@ -32,4 +32,39 @@ class GistApiNetwork{
 			});
 		});
 	}
+
+	getFile(rawUrl){
+		return new Http({
+			url:rawUrl
+		}).ajax();
+	}
+
+	save(_){
+		return new Promise(function(resolve, reject){
+			new Storage("GistAccessToken").getItem('accessToken').then((accessToken)=>{
+				var data = {
+					"description": "テスト中",
+					"files": {}
+				};
+				data.files[_.fileName] = {
+					content:_.text
+				};
+
+				new Http({
+					url:"https://api.github.com/gists/"+_.id,
+					method:"PATCH",
+					data:JSON.stringify(data),
+					headers: {
+						Authorization: "token "+accessToken
+					}
+				}).ajax().then((res)=>{
+					resolve(res);
+				}).catch(()=>{
+					reject();
+				});
+			}).catch(()=>{
+				debugger;
+			});
+		});
+	}
 }

@@ -21,6 +21,10 @@ class GistApiCache{
 		return new Storage('project').setItem(id, project);
 	}
 
+	setFile(file){
+		return new Storage('memos').setItem(file.id+'/'+file.fileName, file);
+	}
+
 	clear(){
 		new Storage('project').clear();
 	}
