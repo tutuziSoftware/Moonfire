@@ -243,6 +243,7 @@ GistAPI.prototype.save = function(_){
 	return new Promise((resolve, reject)=>{
 		this._network.save(_).then(()=>{
 			this._cache.setFile(_);
+			resolve();
 		}).catch(()=>{
 			debugger;
 		});

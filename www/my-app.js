@@ -32,21 +32,6 @@ gistApi.checkAccessToken().then(function(){
 		gistApi.getProjectAll().then(function(projects){
 			//表示
 			view.showLeftMemoList(projects.data);
-
-			//左パネルからメモを表示
-			$$('.leftMemo').on('click', function(){
-				if(mainView.history[mainView.history.length-1].match(/editor.html/)){
-					//pageがeditor.htmlの場合
-					var id = this.dataset.id;
-					mainView.router.reloadPage('editor.html?id='+id);
-				}else{
-					//pageがeditor.html以外の場合
-					var id = this.dataset.id;
-					mainView.router.load({
-						url:'editor.html?id='+id,
-					});
-				}
-			});
 		}).catch(function(){
 			console.log('getGistAll error');
 		});
@@ -109,6 +94,17 @@ myApp.onPageInit('editor', function (page) {
 				id:page.query.id,
 				fileName:page.query.filename,
 				text:$$('#editor').html(),
+			}).then(()=>{
+				var notificationHandle = myApp.addNotification({
+					title: 'MoonFire',
+					message: page.query.filename + ' saved'
+				});
+
+				setTimeout(()=>{
+					myApp.closeNotification(notificationHandle);
+				}, 1000);
+			}).catch(()=>{
+				debugger;
 			});
 
 			//controller.reloadMemoList();
