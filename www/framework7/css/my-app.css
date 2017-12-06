@@ -1,3 +1,12 @@
 .editor_background{
 	background-color: white;
 }
+
+#leftMemoList{
+	list-style: none;
+    padding: 0px;
+}
+
+#leftMemoList li{
+	margin-bottom: 5px;
+}
