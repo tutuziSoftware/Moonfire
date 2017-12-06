@@ -19,23 +19,7 @@ gistApi.checkAccessToken().then(function(){
 	/**
 	 * メモ一覧取得
 	 */
-	(function(){
-		gistApi.getProjectAll().then(function(projects){
-			view.showMemoList(projects.data);
-		});
-	})();
-
-	/**
-	 * 左パネルのメモ一覧に関するもの
-	 */
-	(function(){
-		gistApi.getProjectAll().then(function(projects){
-			//表示
-			view.showLeftMemoList(projects.data);
-		}).catch(function(){
-			console.log('getGistAll error');
-		});
-	})();
+	controller.reloadMemoList();
 }).catch(function(){
 	gistApi.initAccessToken();
 	view.showCodeForm();
@@ -149,4 +133,8 @@ myApp.onPageInit('files', function (page){
 	}).catch(()=>{
 		console.log('gistApi.getFiles().catch');
 	});
+});
+
+myApp.onPageBack('files', function(){
+	controller.reloadMemoList();
 });

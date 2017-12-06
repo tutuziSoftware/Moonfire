@@ -38,6 +38,10 @@ view.showLeftMemoList = function(projects){
 	});
 };
 
+view.clearLeftMemoList = function(){
+	$$('#leftMemoList').empty();
+};
+
 /**
  * 右パネルにメニューを表示します。
  * @param menu {
