@@ -49,9 +49,7 @@ gistApi.checkAccessToken().then(function(){
 	var testMenu = {
 		templateName:'rightMenuTemplate',
 		templateData:{
-			menus:[{
-				menuName:'TODO',
-			}],
+			menus:[],
 		},
 		onAfter:function(rightPanel){
 			//TODO メニューが複数になったらループする

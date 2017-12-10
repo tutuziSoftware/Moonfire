@@ -112,34 +112,6 @@
         </ul>
     </script>
 
-    <!-- TODOリスト -->
-    <script id="todoTemplate" type="text/template7">
-        <p>
-            <a id="todoAdd" href="#" class="link icon-only">
-                <i class="f7-icons">add</i>
-            </a>
-            TODO
-        </p>
-        <ul id="todoList">
-            {{#each tasks}}
-            <li class="swipeout">
-                <label class="todoListBox">
-                    <input name="todoListChecked" type="checkbox" {{#if checked}}checked{{/if}}>
-                    <input name="todoListTaskName" value="{{name}}">
-                </label>
-            </li>
-            {{/each}}
-        </ul>
-    </script>
-    <script id="todoListElementTemplate" type="text/template7">
-        <li class="swipeout">
-            <label class="todoListBox">
-                <input name="todoListChecked" type="checkbox">
-                <input name="todoListTaskName" value="{{name}}">
-            </label>
-        </li>
-    </script>
-
 
     <!-- Path to Framework7 Library JS-->
     <script type="text/javascript" src="framework7/js/framework7.min.js"></script>
