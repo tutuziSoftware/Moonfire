@@ -83,6 +83,17 @@ view.showFiles = function(projectFiles){
 	});
 };
 
+view.Loading = class{
+	show(){
+		var template = Template7.templates.loading();
+		$$('.loading').append(template);
+	}
+
+	hide(){
+		$$('.loading').empty();
+	}
+};
+
 /**
  * エディタの1行目を必ず<div>で覆う為の関数です。
  *
