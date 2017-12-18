@@ -126,10 +126,15 @@ myApp.onPageInit('editor', function (page) {
 myApp.onPageInit('files', function (page){
 	var gistId = page.query.id;
 
+	var loading = new view.Loading;
+	loading.show();
+
 	gistApi.getFiles(gistId).then((files)=>{
 		view.showFiles(files);
+		loading.hide();
 	}).catch(()=>{
 		console.log('gistApi.getFiles().catch');
+		loading.hide();
 	});
 });
 
