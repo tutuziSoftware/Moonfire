@@ -50,31 +50,16 @@ GistAPI.prototype.setCode = function(code){
 		});
 	});
 };
-GistAPI.prototype.createGist = function(gistName, text){
+GistAPI.prototype.createGist = function(data){
 	return new Promise(function(resolve, reject){
-		new Storage("accessToken").getItem().then(function(accessToken){
-			var files = {};
-			files[gistName ? gistName : "_"] = {
-				content:text ? text : "_"
-			};
-
-			console.log(files);
-
-			this._$http({
-				url:"https://api.github.com/gists",
-				method:"POST",
-				data:{
-					files:files
-				},
-				headers: {
-					Authorization: "token "+accessToken
-				}
-			}).success(function(gist){
-				resolve(gist);
-			}).error(function(){
-				reject();
-			});
-		}.bind(this));
+		this._network.create(data).then((json)=>{
+			var result = JSON.parse(json);
+			this._cache.setItem(result.id, result);
+			resolve();
+		}).catch(function(){
+			debugger;
+			reject();
+		});
 	}.bind(this));
 }
 /**

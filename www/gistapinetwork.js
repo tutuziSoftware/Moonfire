@@ -67,4 +67,25 @@ class GistApiNetwork{
 			});
 		});
 	}
+
+	create(data){
+		return new Promise(function(resolve, reject){
+			new Storage('GistAccessToken').getItem('accessToken').then(function(accessToken){
+				new Http({
+					url:"https://api.github.com/gists",
+					method:"POST",
+					data:JSON.stringify(data),
+					headers: {
+						Authorization: "token "+accessToken
+					}
+				}).ajax().then(function(gist){
+					resolve(gist);
+				}).catch(function(){
+					reject();
+				});
+			}).catch(function(){
+				reject();
+			});
+		});
+	}
 }

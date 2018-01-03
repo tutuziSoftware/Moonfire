@@ -110,10 +110,19 @@ myApp.onPageInit('editor', function (page) {
 			var title = $$('#editor').children()[0].innerText;
 			var text = $$('#editor').html();
 
-			model.saveGist({
-				id:id,
-				title:title,
-				text:text,
+			var files = {};
+			files[title] = {
+				content:text
+			};
+
+			gistApi.createGist({
+				files:files,
+				description:'TODO',
+				public:false,
+			}).then(function(){
+				debugger;
+			}).catch(function(){
+				debugger;
 			});
 
 			controller.reloadMemoList();
